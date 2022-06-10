@@ -7,16 +7,6 @@ resource "azurerm_virtual_network" "vnet" {
   tags = var.tags
 }
 
-resource "null_resource" "delay_subnet_subnet" {
-  provisioner "local-exec" {
-    command = "sleep 30"
-  }
-
-  triggers = {
-    "before" = "${azurerm_subnet.subnet.id}"
-  }
-}
-
 resource "azurerm_subnet" "subnet" {
   depends_on = [azurerm_virtual_network.vnet]
   count = length(var.subnet_names)
@@ -80,6 +70,16 @@ resource "azurerm_route_table" "backend" {
     name = "To-Internet"
     address_prefix = "0.0.0.0/0"
     next_hop_type = local.next_hop_type_allowed_values[4]
+  }
+}
+
+resource "null_resource" "subnet_route_table_associ_backend" {
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+
+  triggers = {
+    "before" = "${azurerm_subnet_route_table_association.backend_association.id}"
   }
 }
 

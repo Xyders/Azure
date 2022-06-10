@@ -96,6 +96,16 @@ resource "azurerm_public_ip" "cluster-vip" {
   public_ip_prefix_id = var.use_public_ip_prefix ? (var.create_public_ip_prefix ? azurerm_public_ip_prefix.public_ip_prefix[0].id : var.existing_public_ip_prefix_id) : null
 }
 
+resource "null_resource" "delay_network_interface_nic_vip" {
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+
+  triggers = {
+    "before" = "${azurerm_network_interface.nic_vip.id}"
+  }
+}
+
 resource "azurerm_network_interface" "nic_vip" {
   depends_on = [
     azurerm_public_ip.cluster-vip,
