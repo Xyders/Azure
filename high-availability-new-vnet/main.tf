@@ -39,6 +39,7 @@ module "vnet" {
   subnet_prefixes = var.subnet_prefixes
 }
 
+# The NSG is associated with the frontend and backend subnet and allows all inbound and outbound TCP and UDP traffic.
 module "network-security-group" {
   source = "../modules/network-security-group"
   resource_group_name = module.common.resource_group_name
@@ -67,6 +68,7 @@ resource "random_id" "random_id" {
   }
 }
 
+# default no public IP prefix
 resource "azurerm_public_ip_prefix" "public_ip_prefix" {
   count = var.use_public_ip_prefix && var.create_public_ip_prefix ? 1 : 0
   name = "${module.common.resource_group_name}-ipprefix"
@@ -75,6 +77,9 @@ resource "azurerm_public_ip_prefix" "public_ip_prefix" {
   prefix_length = 30
 }
 
+# 2 public IPs for 2 NVAs, with 2 DNS names defined here
+# azurerm_public_ip.public-ip.0 and azurerm_public_ip.public-ip.1
+# used for azurerm_network_interface.nic_vip and azurerm_network_interface.nic
 resource "azurerm_public_ip" "public-ip" {
   count = 2
   name = "${var.cluster_name}${count.index+1}_IP"
@@ -86,6 +91,8 @@ resource "azurerm_public_ip" "public-ip" {
   public_ip_prefix_id = var.use_public_ip_prefix ? (var.create_public_ip_prefix ? azurerm_public_ip_prefix.public_ip_prefix[0].id : var.existing_public_ip_prefix_id) : null
 }
 
+# azurerm_public_ip.cluster-vip
+# used for azurerm_network_interface.nic_vip
 resource "azurerm_public_ip" "cluster-vip" {
   name = var.cluster_name
   location = module.common.resource_group_location
@@ -106,6 +113,8 @@ resource "null_resource" "delay_network_interface_nic_vip" {
   }
 }
 
+# frontend LB nic, including external IP for NVA (internal IP is 5) 
+# and external vip (internal IP is 7)
 resource "azurerm_network_interface" "nic_vip" {
   depends_on = [
     azurerm_public_ip.cluster-vip,
@@ -141,6 +150,7 @@ resource "azurerm_network_interface" "nic_vip" {
   }
 }
 
+# frontend LB address pool associ, with the vip nic
 resource "azurerm_network_interface_backend_address_pool_association" "nic_vip_lb_association" {
   depends_on = [azurerm_network_interface.nic_vip, azurerm_lb_backend_address_pool.frontend-lb-pool]
   network_interface_id    = azurerm_network_interface.nic_vip.id
@@ -148,6 +158,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "nic_vip_l
   backend_address_pool_id = azurerm_lb_backend_address_pool.frontend-lb-pool.id
 }
 
+# frontend LB nic, including external IP for NVA (internal IP is 6)
 resource "azurerm_network_interface" "nic" {
   depends_on = [
     azurerm_public_ip.public-ip,
@@ -175,6 +186,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+# frontend LB address pool associ, the same pool as vip nic, but with the nic other than vip nic
 resource "azurerm_network_interface_backend_address_pool_association" "nic_lb_association" {
   depends_on = [azurerm_network_interface.nic, azurerm_lb_backend_address_pool.frontend-lb-pool]
   network_interface_id    = azurerm_network_interface.nic.id
@@ -182,6 +194,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "nic_lb_as
   backend_address_pool_id = azurerm_lb_backend_address_pool.frontend-lb-pool.id
 }
 
+# backend LB nic, no external (internal IPs nic1.0 and nic1.1 are 5 and 6)
 resource "azurerm_network_interface" "nic1" {
   depends_on = [
     azurerm_lb.backend-lb]
@@ -200,6 +213,7 @@ resource "azurerm_network_interface" "nic1" {
   }
 }
 
+# backend LB address pool associ, with nic1.0 and nic1.1
 resource "azurerm_network_interface_backend_address_pool_association" "nic1_lb_association" {
   depends_on = [azurerm_network_interface.nic1, azurerm_lb_backend_address_pool.backend-lb-pool]
   count = 2
@@ -424,6 +438,10 @@ resource "azurerm_virtual_machine" "vm-instance-availability-set" {
   }
 }
 
+# default number is 2 VMs
+# default delete_os_disk_on_termination = true
+# default vm_instance_identity = SystemAssigned
+# default enable_custom_metrics = true
 resource "azurerm_virtual_machine" "vm-instance-availability-zone" {
   depends_on = [
     azurerm_network_interface.nic,
@@ -514,6 +532,7 @@ resource "azurerm_virtual_machine" "vm-instance-availability-zone" {
     storage_uri = module.common.boot_diagnostics ? join(",", azurerm_storage_account.vm-boot-diagnostics-storage.*.primary_blob_endpoint) : ""
   }
 }
+
 //********************** Role Assigments **************************//
 data "azurerm_role_definition" "role_definition" {
   name = module.common.role_definition

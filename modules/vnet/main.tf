@@ -16,6 +16,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes = [var.subnet_prefixes[count.index]]
 }
 
+# The NSG is associated with the frontend and backend subnet and allows all inbound and outbound TCP and UDP traffic.
 resource "azurerm_subnet_network_security_group_association" "security_group_frontend_association" {
   depends_on = [azurerm_virtual_network.vnet, azurerm_subnet.subnet[0]]
   subnet_id = azurerm_subnet.subnet[0].id
@@ -79,7 +80,7 @@ resource "null_resource" "subnet_route_table_associ_backend" {
   }
 
   triggers = {
-    "before" = "${azurerm_subnet_route_table_association.backend_association.id}"
+    "before" = "${azurerm_subnet_route_table_association.backend_association[0].id}"
   }
 }
 
