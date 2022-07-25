@@ -1,13 +1,14 @@
 # Set in this file your deployment variables
-cspm-key-id     = "c97dcb6e-95b4-4eb6-91d0-744fbe1688a4"
-cspm-key-secret = "xxx"
+# Infinity service account under shota org
+cspm-key-id     = "dd837a66-****-****-****-************"
+cspm-key-secret = "****bqhh8xt9eci3********"
 
-cspm-org-unit   = "team-A"
+cspm-org-unit   = "team A"
 
 azure-onboard   = true
-azure-op-mode   = "Read" # operation_mode - (Required) Dome9 operation mode for the Azure account ("Read" or "Manage")
+azure-op-mode   = "Manage" # operation_mode - (Required) Dome9 operation mode for the Azure account ("Read" or "Manage")
 azure-accounts  =  {
-  "0" = ["cloudguard_api_0602","xxx","xxx","xxx","xxx"]
+  "0" = ["Scott Azure acct","bf9715e2-****-****-****-************","01605c2e-84df-4dfc-af6c-4f706350e670","afb4b565-7c87-431e-81df-4b083c263edd","ztS*************************************"]
 # "1" = ["NAME","SUBSCRIPTION ID","TENANT ID","CLIENT ID","CLIENT PASSWORD"]
 # "2" = ["NAME","SUBSCRIPTION ID","TENANT ID","CLIENT ID","CLIENT PASSWORD"]
 }

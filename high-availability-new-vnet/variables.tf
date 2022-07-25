@@ -241,7 +241,7 @@ variable "client_secret" {
 }
 
 variable "sku" {
-  description = "SKU"
+  description = "The SKU of the Public IP. Accepted values are Basic and Standard. TF defaults to Basic."
   type = string
   default = "Standard"
 }

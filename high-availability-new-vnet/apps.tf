@@ -86,6 +86,32 @@ resource "azurerm_subnet_route_table_association" "web_association" {
   route_table_id = azurerm_route_table.web_rt.id
 }
 
+# Load Balancing Rules of the External Load Balancer
+# Example 1: Frontend Web:443 Backend port 8081
+# Example 2: Frontend App:80  Backend port 8083
+#resource "azurerm_route_table" "frontend" {
+#  name = azurerm_subnet.subnet[0].name
+#  location = var.location
+#  resource_group_name = var.resource_group_name
+#
+#  route {
+#    name = "Local-Subnet"
+#    address_prefix = azurerm_subnet.subnet[0].address_prefix
+#    next_hop_type = local.next_hop_type_allowed_values[1]
+#  }
+#  route {
+#    name = "To-Internal"
+#    address_prefix = var.address_space
+#    next_hop_type = local.next_hop_type_allowed_values[4]
+#  }
+#}
+
+resource "azurerm_subnet_route_table_association" "frontend_association" {
+  subnet_id = azurerm_subnet.subnet[0].id
+  route_table_id = azurerm_route_table.frontend.id
+}
+
+
 
 #//********************** Security Groups **************************//
 ## Create Application Security Group

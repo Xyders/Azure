@@ -7,6 +7,10 @@ output "cluster-vip" {
   value = azurerm_public_ip.cluster-vip.ip_address
 }
 
+output "cluster-vip-private" {
+  value = azurerm_network_interface.nic_vip.ip_configuration[1].private_ip_address
+}
+
 output "public-ip-lb" {
   value = azurerm_public_ip.public-ip-lb.ip_address
 }

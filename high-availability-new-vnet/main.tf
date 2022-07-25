@@ -158,7 +158,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "nic_vip_l
   backend_address_pool_id = azurerm_lb_backend_address_pool.frontend-lb-pool.id
 }
 
-# frontend LB nic, including external IP for NVA (internal IP is 6)
+# frontend LB nic for another NVA, including external IP (internal IP is 6)
 resource "azurerm_network_interface" "nic" {
   depends_on = [
     azurerm_public_ip.public-ip,

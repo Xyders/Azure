@@ -10,5 +10,3 @@ terraform {
 provider "azurerm" {
   features {}
 }
-# add for AD configuration for Dome9
-# provider "azuread" {}

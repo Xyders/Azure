@@ -29,6 +29,7 @@ resource "azurerm_subnet_network_security_group_association" "security_group_bac
   network_security_group_id = var.nsg_id
 }
 
+# Define and associate route tables
 locals { // locals for 'next_hop_type' allowed values
   next_hop_type_allowed_values = [
     "VirtualNetworkGateway",
@@ -39,6 +40,9 @@ locals { // locals for 'next_hop_type' allowed values
   ]
 }
 
+# Frontend
+# 10.0.0.0/16 None (Drop)
+# 10.0.1.0/24 Virtual Network
 resource "azurerm_route_table" "frontend" {
   name = azurerm_subnet.subnet[0].name
   location = var.location
@@ -61,6 +65,8 @@ resource "azurerm_subnet_route_table_association" "frontend_association" {
   route_table_id = azurerm_route_table.frontend.id
 }
 
+# Backend
+# 0.0.0.0/0 None (Drop)
 resource "azurerm_route_table" "backend" {
   count = length(var.subnet_names) >= 2 ? 1 : 0
   name = azurerm_subnet.subnet[1].name

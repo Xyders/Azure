@@ -23,10 +23,10 @@ variable "azure-onboard" {
 variable "azure-op-mode" {
     description = "Choose in which operating mode you want your Azure accounts to work"
     type = string
-    default = "Read-Only"
+    default = ""
 }
 locals { // locals for 'azure-op-mode' allowed values
-    azure-op-mode_allowed_values = ["Managed", "Read"]
+    azure-op-mode_allowed_values = ["Manage", "Read"]
     // will fail if [var.azure-op-mode] is invalid:
     validate_azure-op-mode = index(local.azure-op-mode_allowed_values, var.azure-op-mode)
 }

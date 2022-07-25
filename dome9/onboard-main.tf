@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">=0.12"  
   required_providers {
     dome9 = {
       source = "dome9/dome9"
@@ -12,7 +13,6 @@ provider "dome9" {
   dome9_access_id   = var.cspm-key-id
   dome9_secret_key  = var.cspm-key-secret
 }
-
 
 
 # Create a dedicated Org-unit under the root one
@@ -139,4 +139,3 @@ resource "dome9_cloudaccount_kubernetes" "onboard-k8s-clusters" {
   organizational_unit_id = dome9_organizational_unit.my-org-unit.id
   depends_on = [dome9_organizational_unit.my-org-unit]
 }
-
