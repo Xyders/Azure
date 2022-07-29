@@ -108,3 +108,11 @@ resource "azurerm_role_assignment" "main" {
   count                = var.role != "" ? length(local.scopes) : 0
   #role_definition_id   = format("%s%s", data.azurerm_subscription.main.id, data.azurerm_role_definition.main[0].id)
 }
+
+# Assign EventGrid Contributor, if Intelligence onboarding is needed
+resource "azurerm_role_assignment" "second" {
+  scope                = local.scopes[count.index]
+  role_definition_name = "EventGrid Contributor"
+  principal_id         = azuread_service_principal.main.object_id
+  count                = var.role != "" ? length(local.scopes) : 0
+}
